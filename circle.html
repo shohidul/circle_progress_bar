@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Circle Progress</title>
+    <style>
+        .form-progress-div {
+            width: 120px;
+            margin: 50px auto;
+        }
+        #circle{
+            position: relative;
+        }
+        #circle strong {
+            position: absolute;
+            top: 38px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            line-height: 40px;
+            font-size: 25px;
+            color: dodgerblue;
+        }
+
+        #circle strong i {
+          font-style: normal;
+          font-size: 0.6em;
+          font-weight: normal;
+        }
+
+        #circle span {
+          display: block;
+          color: #828282;
+          margin-top: 12px;
+          text-align: center;
+        }
+        
+       
+    </style>
+</head>
+<body>
+   <div class="form-progress-div">
+        <div id="circle">
+            <strong>0<i>%</i></strong>
+            <span>Profile Progress</span>
+        </div>
+    </div>
+   
+    <script src="jquery-3.3.1.min.js"></script>
+    <script src="circle-progress.min.js"></script>
+    <script>
+        /* start:: progress circle */
+    var profileProgress = $('#circle').circleProgress({
+        value: 0,
+        size: 120,
+        startAngle: 300,
+        thickness: 5,
+        lineCap: "round",
+        fill: "dodgerblue"
+      });
+    
+    
+    function updateProgress(newVal){
+    	$('#circle').find('strong').prop('Counter', profileProgress.circleProgress('value')*100).animate({
+	        Counter: newVal
+	    }, {
+	        duration: 1000,
+	        easing: 'swing',
+	        step: function (now) {
+	            $(this).html(Math.ceil(now)+"<i>%</i>");
+	        }
+	    });
+    	profileProgress.circleProgress({ animationStartValue: profileProgress.circleProgress('value'), value: newVal/100 });
+    }
+    updateProgress(75)
+    /* start:: progress circle */
+        
+ 
+    </script>    
+        
+</body>
+</html>

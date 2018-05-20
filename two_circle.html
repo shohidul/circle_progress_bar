@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Two Circle Progress</title>
+    <style>
+        .chart-wrap{
+          width: 120px;
+          height: 120px;
+          position: relative;
+          margin: 50px auto;
+        }
+        .chart{
+          position: absolute;
+          top:0;
+          left:0;
+        }
+        .chart-wrap  strong {
+            position: absolute;
+            top: 38px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            line-height: 40px;
+            font-size: 25px;
+            color: dodgerblue;
+        }
+        .chart-wrap strong i {
+          font-style: normal;
+          font-size: 0.6em;
+          font-weight: normal;
+        }
+
+        .chart-wrap span {
+            display: block;
+            color: #828282;
+            text-align: center;
+            width: 100%;
+        }
+        .chart-wrap .span-text {
+            position: absolute;
+            bottom: -45px;
+        }
+        .chart-wrap .span-legend {
+            position: absolute;
+            bottom: -85px;
+            font-size: 13px;
+        }
+        .span-legend i{
+            position: relative;
+            right: -14px;
+        }
+        .required-legend span{
+            height: 4px;
+            width: 15px;
+            background: red;
+            position: absolute;
+            top: 7px;
+            left: 10px;
+            border-radius: 50px;
+        }
+        .optional-legend span{
+            height: 4px;
+            width: 15px;
+            background: dodgerblue;
+            position: absolute;
+            top: 23px;
+            left: 10px;
+            border-radius: 50px;
+        }
+        
+        
+        .form-input {
+           display: flex;
+           justify-content: center;
+        }
+        .form-input input{
+            height: 20px;
+            width: 15%;
+            margin: 5px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc
+        }
+        h2{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+   <h2>Fill these fields bellow</h2>
+   <div class="form-input">
+       <input id="r1" type="text" placeholder="Required" required>
+       <input id="o1" type="text">
+       <input id="o2" type="text">
+       <input id="o3" type="text">
+   </div>
+    <div class="chart-wrap">
+      <div class="chart optionalCircle"></div>
+      <div class="chart requiredCircle"></div>
+      <strong>0<i>%</i></strong>
+      <span class="span-text">Profile Progress</span>
+      <span class="span-legend">
+          <span class="required-legend"><span></span><i>Required 25%</i></span>
+          <span class="optional-legend"><span></span><i>Optional 75%</i></span>
+      </span>
+    </div>
+   
+    <script src="jquery-3.3.1.min.js"></script>
+    <script src="circle-progress.min.js"></script>
+<script>
+        
+var optional = 75; 
+var required = 25 ; 
+
+var optionalCircle = $('.optionalCircle').circleProgress({
+    value: 0,
+    size:120,
+    thickness: 4,
+    lineCap: "round",
+    startAngle:0 + (Math.PI * 2),
+    fill: { color: "dodgerblue" },
+    emptyFill: "rgba(232, 232, 232, 0.7)"
+});
+
+
+
+var requiredCircle = $('.requiredCircle').circleProgress({
+    value: 0, 
+    size:120,
+    thickness: 4,
+    lineCap: "round",
+    startAngle:0 + (Math.PI * 2) * (optional/100), 
+    fill: { color: "red" },
+    emptyFill: "rgba(232, 232, 232, 0)"
+});
+
+var newOptional = 0;
+var newRequired = 0;
+var oldBothVal = 0;
+var newBothVal = 0;
+        
+function updateProgressOptional(newVal){
+    oldBothVal = newOptional+newRequired;
+    newOptional = newVal;
+    newBothVal = newOptional+newRequired;
+    if(newVal == 75){
+       optionalCircle.circleProgress({ animationStartValue: optionalCircle.circleProgress('value'), value: newVal/100 - 0.02 });
+    }else{
+       optionalCircle.circleProgress({ animationStartValue: optionalCircle.circleProgress('value'), value: newVal/100 });
+    }
+    
+    updateProgressBoth(newBothVal, oldBothVal);
+}
+//updateProgressOptional(30);
+        
+
+function updateProgressRequired(newVal){ 
+    oldBothVal = newOptional+newRequired;
+    newRequired = newVal;
+    newBothVal = newOptional+newRequired;
+    if(newVal == 25){
+       requiredCircle.circleProgress({ animationStartValue: requiredCircle.circleProgress('value'), value: newVal/100 - 0.02 });
+    }else{
+       requiredCircle.circleProgress({ animationStartValue: requiredCircle.circleProgress('value'), value: newVal/100 });
+    }
+    
+    updateProgressBoth(newBothVal, oldBothVal);
+}
+//updateProgressRequired(10);
+        
+function updateProgressBoth(newBothVal, oldBothVal){
+    $('.chart-wrap').find('strong').prop('Counter', oldBothVal).animate({
+        Counter: newBothVal
+    }, {
+        duration: 1000,
+        easing: 'swing',
+        step: function (now) {
+            $(this).html(Math.ceil(now)+"<i>%</i>");
+        }
+    });
+}
+    
+  
+    var o2 = $("#o2");
+    var o3 = $("#o3");
+    
+    var requiredFilled = 0;
+    var optionalFilled = 0;
+    
+    function requiredCheck(imput){
+        var x = 1;
+        imput.on("input", function(){
+            if($(this).val()!= "" && x == 1){
+                requiredFilled += 25; x++;
+                updateProgressRequired(requiredFilled);
+            }else if($(this).val()== ""){
+                requiredFilled -= 25; x = 1;
+                updateProgressRequired(requiredFilled);
+            }
+        });
+    }
+    requiredCheck($("#r1"));
+    
+    function optionalCheck(imput){
+        var x = 1;
+        imput.on("input", function(){
+            if($(this).val()!= "" && x == 1){
+                optionalFilled += 25; x++; 
+                updateProgressOptional(optionalFilled);
+            }else if($(this).val()== ""){
+                optionalFilled -= 25; x = 1;
+                updateProgressOptional(optionalFilled);
+            }
+        });
+    }
+    optionalCheck($("#o1"));
+    optionalCheck($("#o2"));
+    optionalCheck($("#o3"));
+</script>    
+        
+</body>
+</html>
